@@ -115,7 +115,6 @@ export function StoreLocator({
               <p className="sidebar-label">{t.locatorSubtitle}</p>
               <h2>{visibleStores.length} {t.aroundParis}</h2>
             </div>
-            <span className="sidebar-chip">{t.iframeReady}</span>
           </header>
 
           <div className="store-list">

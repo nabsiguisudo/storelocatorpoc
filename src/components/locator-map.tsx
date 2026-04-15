@@ -45,7 +45,7 @@ function createMarker(store: Store, isActive: boolean) {
     className: "",
     html: `<span class="locator-marker ${isActive ? "is-active" : ""}">${badge}<span class="locator-pin ${variant}${isActive ? " is-active" : ""}"></span></span>`,
     iconSize: [68, 64],
-    iconAnchor: [20, 52],
+    iconAnchor: [34, 52],
   });
 }
 

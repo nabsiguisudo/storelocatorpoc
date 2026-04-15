@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useStoredStores } from "@/lib/store-storage";
 import { Locale, translations } from "@/lib/translations";
@@ -112,6 +112,7 @@ export function StoreManagement({ baseUrl }: { baseUrl: string }) {
   const [geocodeState, setGeocodeState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [suggestionState, setSuggestionState] = useState<"idle" | "loading" | "empty">("idle");
+  const suppressSuggestionFetch = useRef(false);
   const t = translations[locale];
   const embedUrl = useMemo(() => `${baseUrl}/?embed=1`, [baseUrl]);
   const iframeSnippet = `<iframe src="${embedUrl}" style="width:100%;height:720px;border:0;" loading="lazy"></iframe>`;
@@ -169,6 +170,11 @@ export function StoreManagement({ baseUrl }: { baseUrl: string }) {
 
   useEffect(() => {
     const query = formState.address.trim();
+
+    if (suppressSuggestionFetch.current) {
+      suppressSuggestionFetch.current = false;
+      return;
+    }
 
     if (query.length < 3) {
       setSuggestions([]);
@@ -250,6 +256,7 @@ export function StoreManagement({ baseUrl }: { baseUrl: string }) {
           : t.geocodeStatusIdle;
 
   function applySuggestion(suggestion: AddressSuggestion) {
+    suppressSuggestionFetch.current = true;
     setFormState((current) => ({
       ...current,
       address: suggestion.address,
@@ -432,7 +439,10 @@ export function StoreManagement({ baseUrl }: { baseUrl: string }) {
                       key={suggestion.id}
                       type="button"
                       className="suggestion-item"
-                      onClick={() => applySuggestion(suggestion)}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                        applySuggestion(suggestion);
+                      }}
                     >
                       {suggestion.label}
                     </button>

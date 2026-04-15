@@ -140,15 +140,15 @@ textarea {
 }
 
 .utility-field textarea {
-  min-height: 110px;
-  padding: 12px;
+  min-height: 88px;
+  padding: 10px 12px;
   resize: vertical;
 }
 
 .locator-layout {
   display: grid;
   grid-template-columns: 250px 360px minmax(0, 1fr);
-  min-height: calc(100dvh - 142px);
+  align-items: start;
   border: 1px solid var(--line);
   border-radius: 20px;
   overflow: hidden;
@@ -156,7 +156,6 @@ textarea {
 }
 
 .is-embed .locator-layout {
-  min-height: calc(100dvh - 93px);
   border-left: 0;
   border-right: 0;
   border-bottom: 0;
@@ -180,6 +179,7 @@ textarea {
   display: grid;
   grid-template-rows: auto 1fr;
   border-right: 1px solid var(--line);
+  height: min(72vh, 760px);
 }
 
 .sidebar-panel {
@@ -370,7 +370,8 @@ textarea {
 }
 
 .locator-map-panel {
-  min-height: 420px;
+  height: min(72vh, 760px);
+  aspect-ratio: 16 / 9;
 }
 
 .locator-map,
@@ -526,15 +527,17 @@ textarea {
   display: grid;
   grid-template-columns: minmax(320px, 0.8fr) minmax(480px, 1.2fr);
   gap: 18px;
+  align-items: start;
 }
 
 .utility-card {
   display: grid;
-  gap: 16px;
+  gap: 12px;
   padding: 18px;
   border: 1px solid var(--line);
   background: #fff;
   border-radius: 20px;
+  align-content: start;
 }
 
 .utility-card__header {
@@ -552,6 +555,7 @@ textarea {
 .utility-copy {
   margin: 0;
   color: var(--muted);
+  line-height: 1.45;
 }
 
 .utility-field,
@@ -565,7 +569,7 @@ textarea {
 .management-form,
 .management-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .copy-row {
@@ -740,8 +744,14 @@ textarea {
     border-bottom: 1px solid var(--line);
   }
 
+  .locator-sidebar--results,
+  .locator-map-panel {
+    height: auto;
+  }
+
   .locator-map-panel {
     min-height: 340px;
+    aspect-ratio: auto;
   }
 }
 
