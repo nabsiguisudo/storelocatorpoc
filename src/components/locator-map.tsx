@@ -2,7 +2,7 @@
 
 import { divIcon, latLngBounds } from "leaflet";
 import { useEffect } from "react";
-import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet";
 
 import { Store } from "@/types/store";
 
@@ -15,7 +15,7 @@ function FitBounds({ stores, activeStore }: { stores: Store[]; activeStore: Stor
     map.invalidateSize();
 
     if (activeStore) {
-      map.flyTo([activeStore.lat, activeStore.lng], 13, {
+      map.flyTo([activeStore.lat, activeStore.lng], 15, {
         animate: true,
         duration: 0.6,
       });
@@ -36,12 +36,16 @@ function createMarker(store: Store, isActive: boolean) {
     store.type === "owned"
       ? `locator-pin--owned-${store.collectionBrand.toLowerCase()}`
       : "locator-pin--partner";
+  const badge =
+    store.type === "owned"
+      ? `<span class="locator-marker__badge locator-marker__badge--${store.collectionBrand.toLowerCase()}">${store.collectionBrand}</span>`
+      : "";
 
   return divIcon({
     className: "",
-    html: `<span class="locator-pin ${variant}${isActive ? " is-active" : ""}"></span>`,
-    iconSize: [24, 34],
-    iconAnchor: [12, 34],
+    html: `<span class="locator-marker ${isActive ? "is-active" : ""}">${badge}<span class="locator-pin ${variant}${isActive ? " is-active" : ""}"></span></span>`,
+    iconSize: [68, 64],
+    iconAnchor: [20, 52],
   });
 }
 
@@ -63,8 +67,8 @@ export function LocatorMap({
       zoomControl={false}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; CARTO'
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
 
       <FitBounds stores={stores} activeStore={activeStore} />
@@ -77,7 +81,24 @@ export function LocatorMap({
           eventHandlers={{
             click: () => onSelect(store.id),
           }}
-        />
+        >
+          {activeStore?.id === store.id ? (
+            <Tooltip
+              permanent
+              direction="right"
+              offset={[18, -16]}
+              className="store-map-tooltip"
+              opacity={1}
+            >
+              <div className="store-map-tooltip__inner">
+                <strong>{store.name}</strong>
+                <span>{store.address}</span>
+                <span>{store.hoursLabel}</span>
+                <span>{store.phone}</span>
+              </div>
+            </Tooltip>
+          ) : null}
+        </Marker>
       ))}
     </MapContainer>
   );
