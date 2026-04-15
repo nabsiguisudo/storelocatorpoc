@@ -27,6 +27,9 @@ export function StoreLocator({
   const [type, setType] = useState<StoreType | "all">("all");
   const [activeStoreId, setActiveStoreId] = useState("hoka-marais");
   const [locale, setLocale] = useState<Locale>("fr");
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<string | null>(null);
   const deferredQuery = useDeferredValue(query);
   const t = translations[locale];
 
@@ -47,6 +50,36 @@ export function StoreLocator({
     { value: "owned" as const, label: t.brandStores },
     { value: "partner" as const, label: t.partners },
   ];
+
+  const handleLocateUser = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      setLocationStatus(t.locationUnsupported);
+      return;
+    }
+
+    setIsLocating(true);
+    setLocationStatus(null);
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setUserLocation([coords.latitude, coords.longitude]);
+        setActiveStoreId("");
+        setLocationStatus(t.locationReady);
+        setIsLocating(false);
+      },
+      (error) => {
+        setLocationStatus(
+          error.code === error.PERMISSION_DENIED ? t.locationDenied : t.locationUnavailable,
+        );
+        setIsLocating(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+      },
+    );
+  };
 
   return (
     <div className={`locator-screen ${isEmbedMode ? "is-embed" : ""}`}>
@@ -85,6 +118,19 @@ export function StoreLocator({
                 onChange={(event) => setQuery(event.target.value)}
               />
             </label>
+
+            <div className="location-tools">
+              <button
+                type="button"
+                className="ghost-button location-button"
+                onClick={handleLocateUser}
+                disabled={isLocating}
+              >
+                {isLocating ? t.locating : t.locateMe}
+              </button>
+
+              {locationStatus ? <p className="location-note">{locationStatus}</p> : null}
+            </div>
           </div>
 
           <div className="sidebar-panel">
@@ -166,6 +212,8 @@ export function StoreLocator({
             stores={visibleStores}
             activeStore={activeStore}
             onSelect={setActiveStoreId}
+            userLocation={userLocation}
+            userLocationLabel={t.youAreHere}
           />
         </div>
       </div>

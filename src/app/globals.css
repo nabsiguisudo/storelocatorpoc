@@ -208,6 +208,24 @@ textarea {
   padding: 0 14px;
 }
 
+.location-tools {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.location-button[disabled] {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.location-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
 .filter-stack {
   display: grid;
   gap: 10px;
@@ -521,6 +539,31 @@ textarea {
   color: var(--muted);
   font-size: 0.86rem;
   line-height: 1.35;
+}
+
+.user-location-tooltip {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.user-location-tooltip .leaflet-tooltip-content {
+  margin: 0;
+}
+
+.user-location-tooltip::before {
+  display: none;
+}
+
+.user-location-tooltip__inner {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(0, 117, 201, 0.92);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(0, 117, 201, 0.22);
 }
 
 .control-deck {

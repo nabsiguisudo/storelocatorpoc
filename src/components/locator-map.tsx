@@ -2,13 +2,21 @@
 
 import { divIcon, latLngBounds } from "leaflet";
 import { useEffect } from "react";
-import { MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet";
+import { CircleMarker, MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet";
 
 import { Store } from "@/types/store";
 
 const parisCenter: [number, number] = [48.8566, 2.3522];
 
-function FitBounds({ stores, activeStore }: { stores: Store[]; activeStore: Store | null }) {
+function FitBounds({
+  stores,
+  activeStore,
+  userLocation,
+}: {
+  stores: Store[];
+  activeStore: Store | null;
+  userLocation: [number, number] | null;
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -22,11 +30,19 @@ function FitBounds({ stores, activeStore }: { stores: Store[]; activeStore: Stor
       return;
     }
 
+    if (userLocation) {
+      map.flyTo(userLocation, 14, {
+        animate: true,
+        duration: 0.6,
+      });
+      return;
+    }
+
     if (stores.length > 0) {
       const bounds = latLngBounds(stores.map((store) => [store.lat, store.lng]));
       map.fitBounds(bounds.pad(0.18));
     }
-  }, [activeStore, map, stores]);
+  }, [activeStore, map, stores, userLocation]);
 
   return null;
 }
@@ -53,10 +69,14 @@ export function LocatorMap({
   stores,
   activeStore,
   onSelect,
+  userLocation,
+  userLocationLabel,
 }: {
   stores: Store[];
   activeStore: Store | null;
   onSelect: (storeId: string) => void;
+  userLocation: [number, number] | null;
+  userLocationLabel: string;
 }) {
   return (
     <MapContainer
@@ -71,7 +91,24 @@ export function LocatorMap({
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
 
-      <FitBounds stores={stores} activeStore={activeStore} />
+      <FitBounds stores={stores} activeStore={activeStore} userLocation={userLocation} />
+
+      {userLocation ? (
+        <CircleMarker
+          center={userLocation}
+          radius={10}
+          pathOptions={{
+            color: "#ffffff",
+            weight: 3,
+            fillColor: "#0075c9",
+            fillOpacity: 1,
+          }}
+        >
+          <Tooltip permanent direction="top" offset={[0, -12]} className="user-location-tooltip">
+            <div className="user-location-tooltip__inner">{userLocationLabel}</div>
+          </Tooltip>
+        </CircleMarker>
+      ) : null}
 
       {stores.map((store) => (
         <Marker
